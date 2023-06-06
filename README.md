@@ -1,1 +1,1 @@
-Tik-Tak-Toe Game is made using HTML, CSS and JavaScript.
+Tik-Tac-Toe Game is made using HTML, CSS and JavaScript.
