@@ -77,9 +77,26 @@ body {
 
 .game_container .footer .reset_btn:hover {
     background: #0000ffde;
+    background: #4444ee;
 }
 
 .game_container .footer .reset_btn:active {
     scale: 0.97;
     box-shadow: 3px 3px 3px 0px #747477;
+}
+
+.shake_grid {
+    animation: shake .2s ease-in 2;
+}
+
+@keyframes shake {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(3deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
 }
