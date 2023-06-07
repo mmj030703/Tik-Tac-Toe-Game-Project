@@ -1,151 +1,72 @@
-const cellArray = document.querySelectorAll('.cell');
+//* This code has been refactored with the help of ChatGPT.
+const cellArray = Array.from(document.querySelectorAll('.cell'));
 const gameStatusText = document.querySelector('.game_status_text');
 const resetButton = document.querySelector('.reset_btn');
 let userInput = ['', '', '', '', '', '', '', '', ''];
-let turnIndicator = "X";
+let turnIndicator = "X";           //* Indicates whose turn is there between 'X' and '0'.
 
+//* Updates userInput array once user clicks on a cell. 
 const updateUserInput = (cell) => {
-    if(cell.classList.contains('cell1')) {
-        userInput[0] = cell.textContent;
+    const index = cellArray.indexOf(cell);
+    userInput[index] = cell.textContent;
+}
 
-    }
-    else if(cell.classList.contains('cell2')) {
-        userInput[1] = cell.textContent;
-    }
-    else if(cell.classList.contains('cell3')) {
-        userInput[2] = cell.textContent;
-    }
-    else if(cell.classList.contains('cell4')) {
-        userInput[3] = cell.textContent;
-    }
-    else if(cell.classList.contains('cell5')) {
-        userInput[4] = cell.textContent;
-    }
-    else if(cell.classList.contains('cell6')) {
-        userInput[5] = cell.textContent;
-    }
-    else if(cell.classList.contains('cell7')) {
-        userInput[6] = cell.textContent;
-    }
-    else if(cell.classList.contains('cell8')) {
-        userInput[7] = cell.textContent;
-    }
-    else if(cell.classList.contains('cell9')) {
-        userInput[8] = cell.textContent;
+//* Used to change background and text color of cells which made user win. 
+const changeWinningStyle = (indices) => {
+    indices.forEach((index) => {
+        const cell = cellArray[index];
+        cell.style.background = "#0000ffde",
+        cell.style.color = "#fff";
+    });
+}
+
+//* Used to check if there is any winner between 'X' and '0'. 
+const checkWinningCondition = (input) => {
+    const winningCombinations = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],    //* Horizontal Cells
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],    //* Vertical Cells
+        [0, 4, 8], [2, 4, 6]                //* Diagonal Cells
+    ];
+
+    for(const combination of winningCombinations) {
+        const [ind0, ind1, ind2] = combination;                  //* Destructuring Assignment
+        if(userInput[ind0] === input && userInput[ind1] === input && userInput[ind2] === input) {
+            gameStatusText.textContent = `${input} Wins.`;
+            changeWinningStyle([ind0, ind1, ind2]);
+            return true;
+        }
+    };
+    return false;
+};
+
+
+//* Conditions for Game to Draw.
+const checkDrawCondition = () => {
+    if (!userInput.includes('')) {
+        gameStatusText.textContent = 'Game Draw.';
+        document.querySelector('.game_grid').classList.add('shake_grid');
     }
 }
 
 const onCellClick = (eventObj) => {
     const cell = eventObj.target;
 
-    if((cell.textContent !== '') || (gameStatusText.textContent === "X Wins.") || (gameStatusText.textContent === "0 Wins.") || (gameStatusText.textContent === "Game Draw.")) {
+    //* corner cases
+    if ((cell.textContent !== '') || (gameStatusText.textContent === "X Wins.") || (gameStatusText.textContent === "0 Wins.") || (gameStatusText.textContent === "Game Draw.")) {
         return;
     }
 
-    if(turnIndicator === 'X') {
-        cell.textContent = 'X';
-        turnIndicator = '0';
-        gameStatusText.textContent = "0's turn";
-    }
-    else {
-        cell.textContent = '0';
-        turnIndicator = 'X';
-        gameStatusText.textContent = "X's turn";
-    }
-    
+    cell.textContent = turnIndicator;
     updateUserInput(cell);
-    checkWinner();
+
+    turnIndicator = turnIndicator === 'X' ? '0' : 'X';
+    gameStatusText.textContent = `${turnIndicator}'s turn`;
+
+    if (checkWinningCondition('X') || checkWinningCondition('0')) {
+        return;
+    }
+    checkDrawCondition();
 }
-
-const changeStyle = (cells) => {
-    cells.forEach((cell) => {
-        Object.assign(cell.style, {
-            background: "#0000ffde",
-            color: "#fff"
-        });
-    });
-}
-
-const checkWinner = () => {
-    //* Conditions for X to win. 
-    if((userInput[0] === 'X' && userInput[1] === 'X' && userInput[2] === 'X') || (userInput[3] === 'X' && userInput[4] === 'X' && userInput[5] === 'X') || (userInput[6] === 'X' && userInput[7] === 'X' && userInput[8] === 'X')) {
-        gameStatusText.textContent = 'X Wins.';
-        if(userInput[0] === 'X' && userInput[1] === 'X' && userInput[2] === 'X') {
-            changeStyle([document.querySelector('.cell1'), document.querySelector('.cell2'), document.querySelector('.cell3')]);
-        }
-        if(userInput[3] === 'X' && userInput[4] === 'X' && userInput[5] === 'X') {
-            changeStyle([document.querySelector('.cell4'), document.querySelector('.cell5'), document.querySelector('.cell6')]);
-        }
-        if(userInput[6] === 'X' && userInput[7] === 'X' && userInput[8] === 'X') {
-            changeStyle([document.querySelector('.cell7'), document.querySelector('.cell8'), document.querySelector('.cell9')]);
-        }
-    }
-    if((userInput[0] === 'X' && userInput[3] === 'X' && userInput[6] === 'X') || (userInput[1] === 'X' && userInput[4] === 'X' && userInput[7] === 'X') || (userInput[2] === 'X' && userInput[5] === 'X' && userInput[8] === 'X')) {
-        gameStatusText.textContent = 'X Wins.';
-        if(userInput[0] === 'X' && userInput[3] === 'X' && userInput[6] === 'X') {
-            changeStyle([document.querySelector('.cell1'), document.querySelector('.cell4'), document.querySelector('.cell7')]);
-        }
-        if(userInput[1] === 'X' && userInput[4] === 'X' && userInput[7] === 'X') {
-            changeStyle([document.querySelector('.cell2'), document.querySelector('.cell5'), document.querySelector('.cell8')]);
-        }
-        if(userInput[2] === 'X' && userInput[5] === 'X' && userInput[8] === 'X') {
-            changeStyle([document.querySelector('.cell3'), document.querySelector('.cell6'), document.querySelector('.cell9')]);
-        }
-    }
-    if((userInput[0] === 'X' && userInput[4] === 'X' && userInput[8] === 'X') || (userInput[2] === 'X' && userInput[4] === 'X' && userInput[6] === 'X')) {
-        gameStatusText.textContent = 'X Wins.';
-        if(userInput[0] === 'X' && userInput[4] === 'X' && userInput[8] === 'X') {
-            changeStyle([document.querySelector('.cell1'), document.querySelector('.cell5'), document.querySelector('.cell9')]);
-        }
-        if(userInput[2] === 'X' && userInput[4] === 'X' && userInput[6] === 'X') {
-            changeStyle([document.querySelector('.cell3'), document.querySelector('.cell5'), document.querySelector('.cell7')]);
-        }
-    }
-
-    //* Conditions for 0 to win. 
-    if((userInput[0] === '0' && userInput[1] === '0' && userInput[2] === '0') || (userInput[3] === '0' && userInput[4] === '0' && userInput[5] === '0') || (userInput[6] === '0' && userInput[7] === '0' && userInput[8] === '0')) {
-        gameStatusText.textContent = '0 Wins.';
-        if(userInput[0] === '0' && userInput[1] === '0' && userInput[2] === '0') {
-            changeStyle([document.querySelector('.cell1'), document.querySelector('.cell2'), document.querySelector('.cell3')]);
-        }
-        if(userInput[3] === '0' && userInput[4] === '0' && userInput[5] === '0') {
-            changeStyle([document.querySelector('.cell4'), document.querySelector('.cell5'), document.querySelector('.cell6')]);
-        }
-        if(userInput[6] === '0' && userInput[7] === '0' && userInput[8] === '0') {
-            changeStyle([document.querySelector('.cell7'), document.querySelector('.cell8'), document.querySelector('.cell9')]);
-        }
-    }
-    if((userInput[0] === '0' && userInput[3] === '0' && userInput[6] === '0') || (userInput[1] === '0' && userInput[4] === '0' && userInput[7] === '0') || (userInput[2] === '0' && userInput[5] === '0' && userInput[8] === '0')) {
-        gameStatusText.textContent = '0 Wins.';
-        if(userInput[0] === '0' && userInput[3] === '0' && userInput[6] === '0') {
-            changeStyle([document.querySelector('.cell1'), document.querySelector('.cell4'), document.querySelector('.cell7')]);
-        }
-        if(userInput[1] === '0' && userInput[4] === '0' && userInput[7] === '0') {
-            changeStyle([document.querySelector('.cell2'), document.querySelector('.cell5'), document.querySelector('.cell8')]);
-        }
-        if(userInput[2] === '0' && userInput[5] === '0' && userInput[8] === '0') {
-            changeStyle([document.querySelector('.cell3'), document.querySelector('.cell6'), document.querySelector('.cell9')]);
-        }
-    }
-    if((userInput[0] === '0' && userInput[4] === '0' && userInput[8] === '0') || (userInput[2] === '0' && userInput[4] === '0' && userInput[6] === '0')) {
-        gameStatusText.textContent = '0 Wins.';
-        if(userInput[0] === '0' && userInput[4] === '0' && userInput[8] === '0') {
-            changeStyle([document.querySelector('.cell1'), document.querySelector('.cell5'), document.querySelector('.cell9')]);
-        }
-        if(userInput[2] === '0' && userInput[4] === '0' && userInput[6] === '0') {
-            changeStyle([document.querySelector('.cell3'), document.querySelector('.cell5'), document.querySelector('.cell7')]);
-        }
-    }
-
-    //* Conditions for Game to Draw.
-    if(!userInput.includes('')) {
-        gameStatusText.textContent = 'Game Draw.';
-    } 
-}
-
-cellArray.forEach((cell) => {
-    cell.addEventListener('click', onCellClick);
-});
 
 const reset = () => {
     cellArray.forEach((cell) => {
@@ -158,6 +79,11 @@ const reset = () => {
     gameStatusText.textContent = "X's turn";
     userInput = ['', '', '', '', '', '', '', '', ''];
     turnIndicator = 'X';
+    document.querySelector('.game_grid').classList.remove('shake_grid');
 }
+
+cellArray.forEach((cell) => {
+    cell.addEventListener('click', onCellClick);
+});
 
 resetButton.addEventListener('click', reset);
