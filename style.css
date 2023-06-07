@@ -41,6 +41,7 @@ body {
     width: 55px;
     height: 60px;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .game_container .game_grid div:hover {
